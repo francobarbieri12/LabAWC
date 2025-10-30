@@ -14,7 +14,7 @@ export function RenderCards(){
               <h5 class="card-title">${p.title}</h5>
               <p class="card-text">${p.description}</p>
             </div>
-          </button>
+          </div>
         </div>
     `;
   });
