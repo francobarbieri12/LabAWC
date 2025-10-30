@@ -1,4 +1,5 @@
 import { getProducts } from "../js/api.js";
+import { setupProductModals } from "./modals.js";
 
 export function RenderCards(){
   let productList = document.querySelector('#product-list')
@@ -7,7 +8,7 @@ export function RenderCards(){
   products.forEach(p => {
     template += `
         <div class="col">
-          <button class="card card-button">
+          <div class="card card-button" data-id="${p.id}">
             <img src="${p.image}" class="card-img-top" alt="${p.title}">
             <div class="card-body">
               <h5 class="card-title">${p.title}</h5>
@@ -18,6 +19,7 @@ export function RenderCards(){
     `;
   });
   productList.innerHTML = template;
+  setupProductModals(productList, products);
 
 }); 
 }
