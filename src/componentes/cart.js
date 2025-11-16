@@ -105,7 +105,6 @@ function addCartEventListeners() {
 }
 
 function handleQuantityIncrease(productId) {
-    console.log("Increasing quantity for product:", productId);
     const newQuantity = updateProductQuantity(productId, 1);
     if (newQuantity !== null) {
         updateQuantityDisplay(productId, newQuantity);
@@ -114,7 +113,6 @@ function handleQuantityIncrease(productId) {
 }
 
 function handleQuantityDecrease(productId) {
-    console.log("Decreasing quantity for product:", productId);
     const newQuantity = updateProductQuantity(productId, -1);
     if (newQuantity !== null) {
         updateQuantityDisplay(productId, newQuantity);
@@ -123,7 +121,6 @@ function handleQuantityDecrease(productId) {
 }
 
 function handleRemoveProduct(productId) {
-    console.log("Removing product:", productId);
     if (removeProduct(productId)) {
         refreshCartDisplay();
     }
