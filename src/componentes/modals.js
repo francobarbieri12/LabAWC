@@ -1,3 +1,7 @@
+import { addProductToCart } from '../js/localstorage.js';
+
+let currentModalProduct = null;
+
 export function ensureProductModalInDOM() {
   if (document.getElementById('productModal')) return;
   const modalHtml = `
@@ -27,12 +31,41 @@ export function ensureProductModalInDOM() {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary">Agregar al carrito</button>
+            <button type="button" class="btn btn-primary" id="addToCartButton">Agregar al carrito</button>
           </div>
         </div>
       </div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  const addToCartButton = document.getElementById('addToCartButton');
+  if (addToCartButton) {
+      addToCartButton.addEventListener('click', () => {
+          if (!currentModalProduct) return;
+          
+          const productForCart = {
+              id: currentModalProduct.id,
+              title: currentModalProduct.title,
+              price: currentModalProduct.price,
+              category: currentModalProduct.category,
+              image: currentModalProduct.image,
+              quantity: 1
+          };
+          
+          addProductToCart(productForCart);
+          
+          showAlert('Producto agregado al carrito', 'success');
+          
+          const event = new CustomEvent('cartUpdated');
+          document.dispatchEvent(event);
+          
+          const modalEl = document.getElementById('productModal');
+          if (modalEl && window.bootstrap) {
+              const modal = bootstrap.Modal.getInstance(modalEl);
+              if (modal) modal.hide();
+          }
+      });
+  }
 }
 
 export function showProductModal(product) {
@@ -52,6 +85,8 @@ export function showProductModal(product) {
   if (modalDescription) modalDescription.textContent = product.description;
   if (modalCategory) modalCategory.textContent = product.category;
   if (modalPrice) modalPrice.textContent = `$ ${product.price}`;
+
+  currentModalProduct = product;
 
   if (window.bootstrap) {
     const modal = new window.bootstrap.Modal(modalEl);
@@ -73,4 +108,27 @@ export function setupProductModals(productListElement, products) {
   });
 }
 
+function showAlert(message, type) {
+    const alertContainer = document.querySelector('.alert-container');
+    const alertId = 'alert-' + Date.now();
+    const alertHtml = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    alertContainer.innerHTML = alertHtml;
 
+    const alertElement = document.getElementById(alertId);
+    if (alertElement && window.bootstrap) {
+        const alert = new bootstrap.Alert(alertElement);
+    }
+
+    setTimeout(() => {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            const bsAlert = bootstrap.Alert.getInstance(alert);
+            if (bsAlert) bsAlert.close();
+        }
+    }, 3000);
+}

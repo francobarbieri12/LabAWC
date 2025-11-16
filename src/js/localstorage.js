@@ -1,41 +1,12 @@
 const CART_KEY = 'cartProducts';
 
-export function saveDummyProducts() {
+export function initCartKey() {
     const existingProducts = getCartProducts();
     if (existingProducts.length > 0) {
         return;
     }
 
-    const products = [
-        {
-            "id": 1,
-            "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-            "price": 109.95,
-            "description": "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-            "category": "men's clothing",
-            "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
-            "rating": {
-                "rate": 3.9,
-                "count": 120
-            },
-            "quantity": 2
-        },
-        {
-            "id": 2,
-            "title": "Mens Casual Premium Slim Fit T-Shirts ",
-            "price": 22.3,
-            "description": "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.",
-            "category": "men's clothing",
-            "image": "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png",
-            "rating": {
-                "rate": 4.1,
-                "count": 259
-            },
-            "quantity": 2
-        }
-    ];
-
-    localStorage.setItem(CART_KEY, JSON.stringify(products));
+    localStorage.setItem(CART_KEY, JSON.stringify([]));
 }
 
 export function getCartProducts() {
@@ -84,4 +55,24 @@ export function getTotalPrice() {
 
 export function clearCart() {
     localStorage.removeItem(CART_KEY);
+}
+
+export function addProductToCart(product) {
+    
+    const cartProducts = getCartProducts();
+    const existingProductIndex = cartProducts.findIndex(p => p.id === product.id);
+    
+    if (existingProductIndex !== -1) {
+        cartProducts[existingProductIndex].quantity += product.quantity || 1;
+    } else {
+        const productToAdd = {
+            ...product,
+            quantity: product.quantity || 1
+        };
+        cartProducts.push(productToAdd);
+    }
+
+    localStorage.setItem(CART_KEY, JSON.stringify(cartProducts));
+
+    return true;
 }

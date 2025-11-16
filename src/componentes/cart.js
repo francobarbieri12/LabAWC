@@ -1,5 +1,5 @@
 import { 
-    saveDummyProducts, 
+    initCartKey, 
     getCartProducts, 
     updateProductQuantity, 
     removeProduct,
@@ -8,7 +8,7 @@ import {
 } from '../js/localstorage.js';
 
 export function RenderCart() {
-    saveDummyProducts();
+    initCartKey();
 
     const cartContainer = document.querySelector('#cart');
     const cartProducts = getCartProducts();
@@ -59,7 +59,7 @@ export function RenderCart() {
       <button class="btn btn-danger w-100 btn-checkout">Eliminar todos los productos</button>
       <button class="btn btn-primary w-100 btn-checkout mt-2">Finalizar compra</button>
     </div>
-    ` : '<p class="text-muted text-center mt-4">Your cart is empty</p>'}
+    ` : '<p class="text-muted text-center mt-4">El carrito está vacio</p>'}
   </div>
 </div>`;
 
@@ -122,6 +122,10 @@ function handleQuantityDecrease(productId) {
 
 function handleRemoveProduct(productId) {
     if (removeProduct(productId)) {
+        const productElement = document.querySelector(`[data-product-id="${productId}"]`);
+        if (productElement) {
+            productElement.remove();
+        }
         refreshCartDisplay();
     }
 }
@@ -149,26 +153,23 @@ function refreshCartDisplay() {
     
     const titleElement = document.querySelector('.offcanvas-title');
     if (titleElement) {
-        titleElement.textContent = `Shopping Cart (${totalItems})`;
+        titleElement.textContent = `Listado productos (${totalItems})`;
     }
     
-    const totalPriceElement = document.querySelector('.offcanvas-body .text-success');
+    const totalPriceElement = document.querySelector('.text-success');
     if (totalPriceElement) {
         totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
     }
     
     if (products.length === 0) {
         const productsList = document.getElementById('cart-products-list');
-        const checkoutSection = document.querySelector('.offcanvas-body .border-top');
+        const checkoutSection = document.querySelector('.mt-5.pt-3');
         
-        if (productsList && checkoutSection) {
-            productsList.innerHTML = '';
+        if (productsList) {
+            productsList.innerHTML = '<p class="text-muted text-center mt-4">El carrito está vacio</p>';
+        }
+        if (checkoutSection) {
             checkoutSection.style.display = 'none';
-            
-            const emptyMessage = document.createElement('p');
-            emptyMessage.className = 'text-muted text-center mt-4';
-            emptyMessage.textContent = 'Your cart is empty';
-            document.querySelector('.offcanvas-body').appendChild(emptyMessage);
         }
     }
 }
@@ -176,3 +177,7 @@ function refreshCartDisplay() {
 export function initCart() {
     RenderCart();
 }
+
+document.addEventListener('cartUpdated', function() {
+    RenderCart();
+});
