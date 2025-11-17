@@ -1,0 +1,134 @@
+import { addProductToCart } from '../js/localstorage.js';
+
+let currentModalProduct = null;
+
+export function ensureProductModalInDOM() {
+  if (document.getElementById('productModal')) return;
+  const modalHtml = `
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="productModalLabel">Detalle de producto</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <div class="row g-3 align-items-start">
+                <div class="col-12 col-md-5">
+                  <img id="modalImage" src="" alt="Imagen del producto" class="img-fluid rounded border" />
+                </div>
+                <div class="col-12 col-md-7">
+                  <h5 id="modalTitle" class="mb-2"></h5>
+                  <p id="modalDescription" class="mb-3"></p>
+                  <div class="d-flex flex-wrap gap-3">
+                    <span id="modalCategory" class="badge text-bg-secondary"></span>
+                    <span id="modalPrice" class="badge text-bg-success"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" id="addToCartButton">Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  const addToCartButton = document.getElementById('addToCartButton');
+  if (addToCartButton) {
+      addToCartButton.addEventListener('click', () => {
+          if (!currentModalProduct) return;
+          
+          const productForCart = {
+              id: currentModalProduct.id,
+              title: currentModalProduct.title,
+              price: currentModalProduct.price,
+              category: currentModalProduct.category,
+              image: currentModalProduct.image,
+              quantity: 1
+          };
+          
+          addProductToCart(productForCart);
+          
+          showAlert('Producto agregado al carrito', 'success');
+          
+          const event = new CustomEvent('cartUpdated');
+          document.dispatchEvent(event);
+          
+          const modalEl = document.getElementById('productModal');
+          if (modalEl && window.bootstrap) {
+              const modal = bootstrap.Modal.getInstance(modalEl);
+              if (modal) modal.hide();
+          }
+      });
+  }
+}
+
+export function showProductModal(product) {
+  const modalEl = document.getElementById('productModal');
+  if (!modalEl) return;
+  const modalTitle = document.getElementById('modalTitle');
+  const modalImage = document.getElementById('modalImage');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalCategory = document.getElementById('modalCategory');
+  const modalPrice = document.getElementById('modalPrice');
+
+  if (modalTitle) modalTitle.textContent = product.title;
+  if (modalImage) {
+    modalImage.src = product.image;
+    modalImage.alt = product.title;
+  }
+  if (modalDescription) modalDescription.textContent = product.description;
+  if (modalCategory) modalCategory.textContent = product.category;
+  if (modalPrice) modalPrice.textContent = `$ ${product.price}`;
+
+  currentModalProduct = product;
+
+  if (window.bootstrap) {
+    const modal = new window.bootstrap.Modal(modalEl);
+    modal.show();
+  }
+}
+
+export function setupProductModals(productListElement, products) {
+  ensureProductModalInDOM();
+  const buttons = productListElement.querySelectorAll('.card-button');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.getAttribute('data-id'));
+      const product = products.find((item) => item.id === id);
+      if (product) {
+        showProductModal(product);
+      }
+    });
+  });
+}
+
+function showAlert(message, type) {
+    const alertContainer = document.querySelector('.alert-container');
+    const alertId = 'alert-' + Date.now();
+    const alertHtml = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    alertContainer.innerHTML = alertHtml;
+
+    const alertElement = document.getElementById(alertId);
+    if (alertElement && window.bootstrap) {
+        const alert = new bootstrap.Alert(alertElement);
+    }
+
+    setTimeout(() => {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            const bsAlert = bootstrap.Alert.getInstance(alert);
+            if (bsAlert) bsAlert.close();
+        }
+    }, 3000);
+}
