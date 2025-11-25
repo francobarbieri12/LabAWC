@@ -63,11 +63,6 @@ searchBar.addEventListener("input", (event) => {
 
   productCols.forEach((col) => {
     const card = col.querySelector(".card");
-searchBar.addEventListener("input", (event) => {
-  const query = event.target.value.toLowerCase();
-  const productCards = document.querySelectorAll("#product-list .card");
-
-  productCards.forEach((card) => {
     const title = card.querySelector(".card-title").textContent.toLowerCase();
     const description = card
       .querySelector(".card-text")
@@ -75,26 +70,14 @@ searchBar.addEventListener("input", (event) => {
 
     if (title.includes(query) || description.includes(query)) {
       visibleCols.push(col);
+      col.style.display = "";
     } else {
       hiddenCols.push(col);
+      col.style.display = "none";
     }
   });
   
   visibleCols.forEach((col) => {
     productList.appendChild(col);
-  });
-  
-  hiddenCols.forEach((col) => {
-    productList.appendChild(col);
-    col.style.display = "none";
-  });
-
-  visibleCols.forEach((col) => {
-    col.style.display = "";
-  });
-      card.style.display = "";
-    } else {
-      card.style.display = "none";
-    }
   });
 });
