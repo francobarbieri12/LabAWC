@@ -1,5 +1,10 @@
+import { showAlert } from "../js/alert.js";
+import { addProductToCart } from "../js/localstorage.js";
+
+let currentModalProduct = null;
+
 export function ensureProductModalInDOM() {
-  if (document.getElementById('productModal')) return;
+  if (document.getElementById("productModal")) return;
   const modalHtml = `
     <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -27,22 +32,51 @@ export function ensureProductModalInDOM() {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary">Agregar al carrito</button>
+            <button type="button" class="btn btn-primary" id="addToCartButton">Agregar al carrito</button>
           </div>
         </div>
       </div>
     </div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+  const addToCartButton = document.getElementById("addToCartButton");
+  if (addToCartButton) {
+    addToCartButton.addEventListener("click", () => {
+      if (!currentModalProduct) return;
+
+      const productForCart = {
+        id: currentModalProduct.id,
+        title: currentModalProduct.title,
+        price: currentModalProduct.price,
+        category: currentModalProduct.category,
+        image: currentModalProduct.image,
+        quantity: 1,
+      };
+
+      addProductToCart(productForCart);
+
+      showAlert("Producto agregado al carrito", "success");
+
+      const event = new CustomEvent("cartUpdated");
+      document.dispatchEvent(event);
+
+      const modalEl = document.getElementById("productModal");
+      if (modalEl && window.bootstrap) {
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+      }
+    });
+  }
 }
 
 export function showProductModal(product) {
-  const modalEl = document.getElementById('productModal');
+  const modalEl = document.getElementById("productModal");
   if (!modalEl) return;
-  const modalTitle = document.getElementById('modalTitle');
-  const modalImage = document.getElementById('modalImage');
-  const modalDescription = document.getElementById('modalDescription');
-  const modalCategory = document.getElementById('modalCategory');
-  const modalPrice = document.getElementById('modalPrice');
+  const modalTitle = document.getElementById("modalTitle");
+  const modalImage = document.getElementById("modalImage");
+  const modalDescription = document.getElementById("modalDescription");
+  const modalCategory = document.getElementById("modalCategory");
+  const modalPrice = document.getElementById("modalPrice");
 
   if (modalTitle) modalTitle.textContent = product.title;
   if (modalImage) {
@@ -53,6 +87,8 @@ export function showProductModal(product) {
   if (modalCategory) modalCategory.textContent = product.category;
   if (modalPrice) modalPrice.textContent = `$ ${product.price}`;
 
+  currentModalProduct = product;
+
   if (window.bootstrap) {
     const modal = new window.bootstrap.Modal(modalEl);
     modal.show();
@@ -61,10 +97,10 @@ export function showProductModal(product) {
 
 export function setupProductModals(productListElement, products) {
   ensureProductModalInDOM();
-  const buttons = productListElement.querySelectorAll('.card-button');
+  const buttons = productListElement.querySelectorAll(".card-button");
   buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = Number(btn.getAttribute('data-id'));
+    btn.addEventListener("click", () => {
+      const id = Number(btn.getAttribute("data-id"));
       const product = products.find((item) => item.id === id);
       if (product) {
         showProductModal(product);
@@ -72,5 +108,3 @@ export function setupProductModals(productListElement, products) {
     });
   });
 }
-
-

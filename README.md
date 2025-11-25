@@ -50,3 +50,25 @@ Utilizar etiquetas semánticas de HTML 5 para el estructurado de la página.
 * **Recursos:**
     * [7 Claves de Accesibilidad Web](https://accesibilidadenlaweb.com.ar/7claves/)
     * [Referencia de Etiquetas HTML](https://www.w3schools.com/tags/tag_html.asp)
+
+## Distribución de Tareas
+
+El trabajo se realizó de forma grupal, distribuyendo las tareas según las siguientes responsabilidades:
+
+#### Kalil Fernández @Kalilalee
+- **Responsable de los puntos 1 a 3**
+- Estructuración inicial del proyecto
+- Implementación del listado de productos
+- Desarrollo del modal de detalle de cada producto
+
+#### Franco Barbieri @francobarbieri12
+- **Responsable de los puntos 4 a 6**
+- Implementación del carrito en el sidebar
+- Gestión del localStorage para el carrito
+- Notificación para gestionar productos en el carrito
+
+#### Nicolás Ludwig @nludw1g
+- **Responsable de los puntos 7 a 9**
+- Lógica de búsqueda de los productos
+- Implementación de finalizar compra y notificación
+- Eliminación total del carrito

@@ -63,6 +63,11 @@ searchBar.addEventListener("input", (event) => {
 
   productCols.forEach((col) => {
     const card = col.querySelector(".card");
+searchBar.addEventListener("input", (event) => {
+  const query = event.target.value.toLowerCase();
+  const productCards = document.querySelectorAll("#product-list .card");
+
+  productCards.forEach((card) => {
     const title = card.querySelector(".card-title").textContent.toLowerCase();
     const description = card
       .querySelector(".card-text")
@@ -86,5 +91,10 @@ searchBar.addEventListener("input", (event) => {
 
   visibleCols.forEach((col) => {
     col.style.display = "";
+  });
+      card.style.display = "";
+    } else {
+      card.style.display = "none";
+    }
   });
 });
